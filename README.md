@@ -2,6 +2,8 @@
 
 An automated API test suite designed to verify integration endpoints and cryptographic signature rules for the **Flitt Payment Gateway**.
 
+[![API Automated Tests](https://github.com/Ebazhanov/flitt-api-tests-ts-automation/actions/workflows/test.yml/badge.svg)](https://github.com/Ebazhanov/flitt-api-tests-ts-automation/actions/workflows/test.yml)
+
 ---
 
 ## 📌 Project Overview
