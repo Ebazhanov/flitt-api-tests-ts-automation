@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import axios from 'axios';
-import { generateSignature } from '../src/signature';
+import { generateSignature } from '../../src/utils/signature';
 
 const BASE_URL = 'https://pay.flitt.com';
 const MERCHANT_ID = 1549901;
