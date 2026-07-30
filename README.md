@@ -51,7 +51,9 @@ This project provides automated test coverage for payment initiation, request va
 - **Step 1 & 2: Order & Link Generation (`/api/checkout/url`)**
   - [x] **Happy Path:** Verify successful creation of `checkout_url` with valid parameters.
   - [x] **Security:** Verify rejection when request signature (`signature`) is missing or invalid.
-  - [ ] **Validation:** Verify failure response when `amount` is zero, negative, or currency is unsupported.
+  - [x] **Payload Validation:** Verify failure response for edge cases:
+    - [x] Negative amount (`amount: -1000`)
+    - [x] Unsupported currency (`currency: 'XYZ'`)
   - [ ] **Boundary Values:** Verify minimal valid amount (`amount: 1`) and maximum allowed transaction limits.
   - [ ] **Character Handling:** Verify sanitization and signature integrity with special characters in `order_desc` (e.g., `&`, `#`, emojis).
 

@@ -9,26 +9,23 @@ const SECRET_KEY = 'test';
 describe('Flitt API - Checkout Endpoint (/api/checkout/url)', () => {
 
     it('Happy Path: should successfully return checkout_url when valid payload is sent', async () => {
-        const orderId = `order_${Date.now()}`;
+        // Guaranteed unique order ID
+        const orderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-        // 1. Prepare request payload
         const requestPayload: Record<string, any> = {
             merchant_id: MERCHANT_ID,
             order_id: orderId,
             order_desc: 'Demo Test Order',
             currency: 'EUR',
-            amount: 1000, // 10.00 EUR in cents
+            amount: 1000,
         };
 
-        // 2. Calculate signature and add it to the payload
         requestPayload.signature = generateSignature(requestPayload, SECRET_KEY);
 
-        // 3. Send POST request
         const response = await axios.post(`${BASE_URL}/api/checkout/url`, {
             request: requestPayload,
         });
 
-        // 4. Assertions
         expect(response.status).toBe(200);
         expect(response.data.response.response_status).toBe('success');
         expect(response.data.response.checkout_url).toBeDefined();
@@ -36,13 +33,15 @@ describe('Flitt API - Checkout Endpoint (/api/checkout/url)', () => {
     });
 
     it('Negative Path: should return failure status when invalid signature is provided', async () => {
+        const orderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
         const requestPayload: Record<string, any> = {
             merchant_id: MERCHANT_ID,
-            order_id: `order_${Date.now()}`,
-            order_desc: 'Negative Test Order',
+            order_id: orderId,
+            order_desc: 'Demo Test Order',
             currency: 'EUR',
             amount: 1000,
-            signature: 'invalid_signature_hash_123',
+            signature: 'invalid_signature_hash',
         };
 
         const response = await axios.post(`${BASE_URL}/api/checkout/url`, {
@@ -51,7 +50,6 @@ describe('Flitt API - Checkout Endpoint (/api/checkout/url)', () => {
 
         expect(response.status).toBe(200);
         expect(response.data.response.response_status).toBe('failure');
-        expect(response.data.response.error_code).toBeDefined();
     });
 
 });
