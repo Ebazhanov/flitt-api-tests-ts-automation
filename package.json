@@ -1,0 +1,29 @@
+{
+  "name": "flitt-api-pure",
+  "version": "1.0.0",
+  "description": "API test learning project for Flitt",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ebazhanov/flitt-api-pure.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ebazhanov/flitt-api-pure/issues"
+  },
+  "homepage": "https://github.com/Ebazhanov/flitt-api-pure#readme",
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "axios": "^1.19.0",
+    "playwright": "^1.62.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}
