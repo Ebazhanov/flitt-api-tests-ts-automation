@@ -60,7 +60,7 @@ This project provides automated test coverage for payment initiation, request va
 - **Step 3 & 4: Payment & Status Check (`/api/status`)**
   - [x] **Happy Path:** Verify order status transitions to `approved` / `created` after initiation.
   - [x] **Data Integrity:** Verify `amount`, `currency`, and `order_id` in status match initial order data.
-  - [ ] **Negative Path:** Verify appropriate error when checking status for non-existent `order_id`.
+  - [x] **Negative Path:** Verify appropriate error when checking status for non-existent `order_id`.
 
 - **🔁 Advanced Resilience & Edge Cases**
   - [ ] **Idempotency:** Verify submitting duplicate requests with the same `order_id` returns the existing payment session without duplicate charges.
@@ -78,11 +78,14 @@ This project provides automated test coverage for payment initiation, request va
 │   └── utils/
 │       └── signature.ts               # Security hash & signature calculation helper
 ├── tests/
-│   └── checkout/
-│       ├── checkout.test.ts           # Happy path & invalid signature tests
-│       ├── checkout-validation.test.ts # Payload & negative validation scenarios
-│       ├── checkout-boundary.test.ts   # Min/max amount & integer boundary tests
-│       └── checkout-character-handling.test.ts # Special chars, emojis & encoding tests
+│   ├── checkout/
+│   │   ├── checkout.test.ts           # Happy path & invalid signature tests
+│   │   ├── checkout-validation.test.ts # Payload & negative validation scenarios
+│   │   ├── checkout-boundary.test.ts   # Min/max amount & integer boundary tests
+│   │   └── checkout-character-handling.test.ts # Special chars, emojis & encoding tests
+│   └── status/
+│       ├── status.test.ts             # Happy path & negative path status checks
+│       └── status-data-integrity.test.ts # Data integrity & payload matching
 ├── package.json
 ├── tsconfig.json
 └── vitest.config.ts
