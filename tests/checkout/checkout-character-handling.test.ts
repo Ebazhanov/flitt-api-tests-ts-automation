@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import axios from 'axios';
-import { generateSignature } from '../../src/utils/signature';
-
-const BASE_URL = 'https://pay.flitt.com';
-const MERCHANT_ID = 1549901;
-const SECRET_KEY = 'test';
+import { createCheckoutUrl } from '../../src/api/flitt.client';
 
 describe('Flitt API - Character Handling & Encoding (/api/checkout/url)', () => {
 
@@ -14,19 +9,11 @@ describe('Flitt API - Character Handling & Encoding (/api/checkout/url)', () => 
         // Special characters, URL query delimiters, quotes, unicode, and emojis
         const complexOrderDesc = 'Order & #123 / Test "Special" <Chars> - 🛒 💳 🇩🇪 %20';
 
-        const requestPayload: Record<string, any> = {
-            merchant_id: MERCHANT_ID,
+        const response = await createCheckoutUrl({
             order_id: orderId,
             order_desc: complexOrderDesc,
             currency: 'EUR',
             amount: 1500,
-        };
-
-        // Signature must be generated against the raw unescaped payload string
-        requestPayload.signature = generateSignature(requestPayload, SECRET_KEY);
-
-        const response = await axios.post(`${BASE_URL}/api/checkout/url`, {
-            request: requestPayload,
         });
 
         expect(response.status).toBe(200);
