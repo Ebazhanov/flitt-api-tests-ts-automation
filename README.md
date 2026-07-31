@@ -54,7 +54,7 @@ This project provides automated test coverage for payment initiation, request va
   - [x] **Payload Validation:** Verify failure response for edge cases:
     - [x] Negative amount (`amount: -1000`)
     - [x] Unsupported currency (`currency: 'XYZ'`)
-  - [ ] **Boundary Values:** Verify minimal valid amount (`amount: 1`) and maximum allowed transaction limits.
+  - [x] **Boundary Values:** Verify minimal valid amount (`amount: 1`) and maximum allowed transaction limits.
   - [ ] **Character Handling:** Verify sanitization and signature integrity with special characters in `order_desc` (e.g., `&`, `#`, emojis).
 
 - **Step 3 & 4: Payment & Status Check (`/api/status`)**
