@@ -59,7 +59,7 @@ This project provides automated test coverage for payment initiation, request va
 
 - **Step 3 & 4: Payment & Status Check (`/api/status`)**
   - [x] **Happy Path:** Verify order status transitions to `approved` / `created` after initiation.
-  - [ ] **Data Integrity:** Verify `amount`, `currency`, and `order_id` in status match initial order data.
+  - [x] **Data Integrity:** Verify `amount`, `currency`, and `order_id` in status match initial order data.
   - [ ] **Negative Path:** Verify appropriate error when checking status for non-existent `order_id`.
 
 - **🔁 Advanced Resilience & Edge Cases**
