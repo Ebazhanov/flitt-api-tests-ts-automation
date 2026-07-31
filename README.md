@@ -71,9 +71,19 @@ This project provides automated test coverage for payment initiation, request va
 
 ```text
 ├── src/
-│   └── signature.ts      # Security hash & signature calculation helper
+│   ├── api/
+│   │   └── flitt.client.ts            # API client wrapper & request handler
+│   ├── config/
+│   │   └── env.config.ts              # Environment credentials & base URLs
+│   └── utils/
+│       └── signature.ts               # Security hash & signature calculation helper
 ├── tests/
-│   └── checkout.test.ts  # API test scenarios for checkout flow
+│   └── checkout/
+│       ├── checkout.test.ts           # Happy path & invalid signature tests
+│       ├── checkout-validation.test.ts # Payload & negative validation scenarios
+│       ├── checkout-boundary.test.ts   # Min/max amount & integer boundary tests
+│       └── checkout-character-handling.test.ts # Special chars, emojis & encoding tests
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+└── vitest.config.ts
 ```
