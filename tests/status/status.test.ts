@@ -1,34 +1,40 @@
 import { describe, it, expect } from 'vitest';
 import { createCheckoutUrl, getOrderStatus } from '../../src/api/flitt.client';
+import { defaultCheckoutPayload } from '../../tests/fixtures/factories';
+import { expectSuccessCheckoutResponse, expectSuccessStatusResponse, expectFailureResponse, expectValidOrderStatus } from '../../tests/helpers/assertions';
+import { TEST_DATA } from '../../tests/fixtures/testData';
 
 describe('Flitt API - Order Status Check (/api/status/order_id)', () => {
 
     it('Happy Path: should successfully return status for a newly created order', async () => {
-        const orderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-
-        // 1. Create a new order via checkout API
-        const checkoutResponse = await createCheckoutUrl({
-            order_id: orderId,
-            order_desc: 'Status Check Test Order',
-            currency: 'EUR',
+        // ARRANGE
+        const payload = defaultCheckoutPayload({
+            order_desc: TEST_DATA.ORDER_DESCRIPTIONS.STATUS_CHECK,
             amount: 1000,
         });
 
-        expect(checkoutResponse.status).toBe(200);
-        expect(checkoutResponse.data.response.response_status).toBe('success');
+        // ACT - Create order
+        const checkoutResponse = await createCheckoutUrl(payload);
+        expectSuccessCheckoutResponse(checkoutResponse);
 
-        // 2. Fetch status for the created order
-        const statusResponse = await getOrderStatus(orderId);
+        // ACT - Get status
+        const statusResponse = await getOrderStatus(payload.order_id);
 
-        // 3. Verify status response validity
-        expect(statusResponse.status).toBe(200);
-        expect(statusResponse.data.response.response_status).toBe('success');
-        expect(statusResponse.data.response.order_id).toBe(orderId);
+        // ASSERT
+        const statusData = expectSuccessStatusResponse(statusResponse);
+        expect(statusData.order_id).toBe(payload.order_id);
+        expectValidOrderStatus(statusData.order_status, TEST_DATA.VALID_ORDER_STATUSES);
+    });
 
-        // Assert initial state ('created', 'approved', 'processing', or 'declined')
-        expect(['created', 'approved', 'processing', 'declined']).toContain(
-            statusResponse.data.response.order_status?.toLowerCase()
-        );
+    it('Negative Path: should return appropriate error when checking status for non-existent order_id', async () => {
+        // ARRANGE
+        const nonExistentOrderId = `order_nonexistent_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+        // ACT
+        const statusResponse = await getOrderStatus(nonExistentOrderId);
+
+        // ASSERT
+        expectFailureResponse(statusResponse);
     });
 
 });
