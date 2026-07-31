@@ -58,7 +58,7 @@ This project provides automated test coverage for payment initiation, request va
   - [x] **Character Handling:** Verify sanitization and signature integrity with special characters in `order_desc` (e.g., `&`, `#`, emojis).
 
 - **Step 3 & 4: Payment & Status Check (`/api/status`)**
-  - [ ] **Happy Path:** Verify order status transitions to `approved` / `created` after initiation.
+  - [x] **Happy Path:** Verify order status transitions to `approved` / `created` after initiation.
   - [ ] **Data Integrity:** Verify `amount`, `currency`, and `order_id` in status match initial order data.
   - [ ] **Negative Path:** Verify appropriate error when checking status for non-existent `order_id`.
 
