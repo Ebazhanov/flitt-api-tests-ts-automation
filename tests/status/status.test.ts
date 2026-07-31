@@ -31,4 +31,14 @@ describe('Flitt API - Order Status Check (/api/status/order_id)', () => {
         );
     });
 
+    it('Negative Path: should return appropriate error when checking status for non-existent order_id', async () => {
+        const nonExistentOrderId = `order_nonexistent_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
+        const statusResponse = await getOrderStatus(nonExistentOrderId);
+
+        expect(statusResponse.status).toBe(200);
+        expect(statusResponse.data.response.response_status).toBe('failure');
+        expect(statusResponse.data.response.error_code).toBeDefined();
+    });
+
 });
