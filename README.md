@@ -65,6 +65,7 @@ This project provides automated test coverage for payment initiation, request va
 - **🔁 Advanced Resilience & Edge Cases**
   - [ ] **Idempotency:** Verify submitting duplicate requests with the same `order_id` returns the existing payment session without duplicate charges.
   - [ ] **System Errors:** Verify framework handles gateway timeouts or HTTP server errors ($500$, $502$, $504$) gracefully.
+
 ---
 
 ## 📁 Project Structure

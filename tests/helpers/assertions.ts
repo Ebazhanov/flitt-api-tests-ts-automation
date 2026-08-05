@@ -1,41 +1,50 @@
 /**
- * Test Assertion Helpers
+ * Test Assertion Helpers (Playwright API Testing)
  */
 
-import { AxiosResponse } from 'axios';
-import { expect } from 'vitest';
+import { APIResponse, expect } from '@playwright/test';
 import { CheckoutUrlResponse, OrderStatusResponse } from '../../src/types/api.types';
+
+/**
+ * Standard API client result wrapper returned by FlittApiClient methods
+ */
+export interface ApiClientResult<T> {
+  response: APIResponse;
+  body: T;
+}
 
 /**
  * Assert successful checkout response
  */
-export function expectSuccessCheckoutResponse(response: AxiosResponse<CheckoutUrlResponse>) {
-  expect(response.status).toBe(200);
-  expect(response.data.response.response_status).toBe('success');
-  expect(response.data.response.checkout_url).toBeDefined();
-  expect(response.data.response.checkout_url).toContain('https://');
-  return response.data.response;
+export function expectSuccessCheckoutResponse(result: ApiClientResult<CheckoutUrlResponse>) {
+  expect(result.response.status()).toBe(200);
+  expect(result.response.ok()).toBeTruthy();
+  expect(result.body.response.response_status).toBe('success');
+  expect(result.body.response.checkout_url).toBeDefined();
+  expect(result.body.response.checkout_url).toContain('https://');
+  return result.body.response;
 }
 
 /**
  * Assert successful status response
  */
-export function expectSuccessStatusResponse(response: AxiosResponse<OrderStatusResponse>) {
-  expect(response.status).toBe(200);
-  expect(response.data.response.response_status).toBe('success');
-  return response.data.response;
+export function expectSuccessStatusResponse(result: ApiClientResult<OrderStatusResponse>) {
+  expect(result.response.status()).toBe(200);
+  expect(result.response.ok()).toBeTruthy();
+  expect(result.body.response.response_status).toBe('success');
+  return result.body.response;
 }
 
 /**
  * Assert failure response with error code
  */
 export function expectFailureResponse(
-  response: AxiosResponse<CheckoutUrlResponse | OrderStatusResponse>
+  result: ApiClientResult<CheckoutUrlResponse | OrderStatusResponse>
 ) {
-  expect(response.status).toBe(200);
-  expect(response.data.response.response_status).toBe('failure');
-  expect(response.data.response.error_code).toBeDefined();
-  return response.data.response;
+  expect(result.response.status()).toBe(200);
+  expect(result.body.response.response_status).toBe('failure');
+  expect(result.body.response.error_code).toBeDefined();
+  return result.body.response;
 }
 
 /**
