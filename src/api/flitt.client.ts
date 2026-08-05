@@ -1,44 +1,69 @@
-import axios, { AxiosResponse } from 'axios';
+import { APIRequestContext, APIResponse } from '@playwright/test';
 import { ENV_CONFIG } from '../config/env.config';
 import { generateSignature } from '../utils/signature';
 import { CheckoutUrlResponse, OrderStatusResponse } from '../types/api.types';
 
-export async function createCheckoutUrl(
+export class FlittApiClient {
+  private baseUrl: string;
+
+  constructor(private request: APIRequestContext) {
+    // Normalizes BASE_URL by removing trailing slashes if present
+    this.baseUrl = ENV_CONFIG.BASE_URL ? ENV_CONFIG.BASE_URL.replace(/\/+$/, '') : '';
+  }
+
+  /**
+   * Sends a request to create a payment checkout URL.
+   */
+  async createCheckoutUrl(
     payload: Record<string, any>
-): Promise<AxiosResponse<CheckoutUrlResponse>> {
+  ): Promise<{ response: APIResponse; body: CheckoutUrlResponse }> {
     const fullPayload: Record<string, any> = {
-        merchant_id: ENV_CONFIG.MERCHANT_ID,
-        ...payload,
+      merchant_id: ENV_CONFIG.MERCHANT_ID,
+      ...payload,
     };
 
     if (!fullPayload.signature) {
-        fullPayload.signature = generateSignature(fullPayload, ENV_CONFIG.SECRET_KEY);
+      fullPayload.signature = generateSignature(fullPayload, ENV_CONFIG.SECRET_KEY);
     }
 
-    const targetUrl = `${ENV_CONFIG.BASE_URL}/api/checkout/url`;
+    const endpoint = `${this.baseUrl}/api/checkout/url`;
 
-    return axios.post<CheckoutUrlResponse>(targetUrl, {
+    const response = await this.request.post(endpoint, {
+      data: {
         request: fullPayload,
+      },
     });
-}
 
-export async function getOrderStatus(
+    const body: CheckoutUrlResponse = await response.json();
+    return { response, body };
+  }
+
+  /**
+   * Sends a request to fetch order status by order_id.
+   */
+  async getOrderStatus(
     orderId: string,
     customPayload?: Record<string, any>
-): Promise<AxiosResponse<OrderStatusResponse>> {
+  ): Promise<{ response: APIResponse; body: OrderStatusResponse }> {
     const fullPayload: Record<string, any> = {
-        merchant_id: ENV_CONFIG.MERCHANT_ID,
-        order_id: orderId,
-        ...customPayload,
+      merchant_id: ENV_CONFIG.MERCHANT_ID,
+      order_id: orderId,
+      ...customPayload,
     };
 
     if (!fullPayload.signature) {
-        fullPayload.signature = generateSignature(fullPayload, ENV_CONFIG.SECRET_KEY);
+      fullPayload.signature = generateSignature(fullPayload, ENV_CONFIG.SECRET_KEY);
     }
 
-    const targetUrl = `${ENV_CONFIG.BASE_URL}/api/status/order_id`;
+    const endpoint = `${this.baseUrl}/api/status/order_id`;
 
-    return axios.post<OrderStatusResponse>(targetUrl, {
+    const response = await this.request.post(endpoint, {
+      data: {
         request: fullPayload,
+      },
     });
+
+    const body: OrderStatusResponse = await response.json();
+    return { response, body };
+  }
 }

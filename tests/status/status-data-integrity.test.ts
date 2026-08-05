@@ -1,37 +1,36 @@
-import { describe, it } from 'vitest';
-import { createCheckoutUrl, getOrderStatus } from '../../src/api/flitt.client';
-import { checkoutPayloadWithAmount } from '../../tests/fixtures/factories';
-import { expectSuccessCheckoutResponse, expectSuccessStatusResponse, expectOrderDataIntegrity } from '../../tests/helpers/assertions';
-import { TEST_DATA } from '../../tests/fixtures/testData';
+import { test } from '@playwright/test';
+import { FlittApiClient } from '../../src/api/flitt.client';
+import { checkoutPayloadWithAmount } from '../fixtures/factories';
+import {
+  expectSuccessCheckoutResponse,
+  expectSuccessStatusResponse,
+  expectOrderDataIntegrity,
+} from '../helpers/assertions';
 
-describe('Flitt API - Order Status Data Integrity (/api/status/order_id)', () => {
+test.describe('Flitt API - Order Status Data Integrity', () => {
+  let flittClient: FlittApiClient;
 
-    it('Data Integrity: should verify amount, currency, and order_id match initial order payload', async () => {
-        // ARRANGE
-        const initialAmount = 2550;
-        const initialCurrency = 'EUR';
-        const payload = checkoutPayloadWithAmount(initialAmount, {
-            order_desc: TEST_DATA.ORDER_DESCRIPTIONS.DATA_INTEGRITY,
-            currency: initialCurrency,
-        });
+  test.beforeEach(({ request }) => {
+    flittClient = new FlittApiClient(request);
+  });
 
-        // ACT - Create order
-        const checkoutResponse = await createCheckoutUrl(payload);
-        expectSuccessCheckoutResponse(checkoutResponse);
+  test('Data Integrity: should match checkout order details in status response', async () => {
+    const amount = 1500;
+    const checkoutPayload = checkoutPayloadWithAmount(amount);
 
-        // ACT - Get status
-        const statusResponse = await getOrderStatus(payload.order_id);
-        const statusData = expectSuccessStatusResponse(statusResponse);
+    const checkoutResult = await flittClient.createCheckoutUrl(checkoutPayload);
+    expectSuccessCheckoutResponse(checkoutResult);
 
-        // ASSERT - Verify data integrity
-        expectOrderDataIntegrity(
-            statusData.order_id,
-            payload.order_id,
-            statusData.amount,
-            initialAmount,
-            statusData.currency,
-            initialCurrency
-        );
-    });
+    const statusResult = await flittClient.getOrderStatus(checkoutPayload.order_id);
+    const statusData = expectSuccessStatusResponse(statusResult);
 
+    expectOrderDataIntegrity(
+      statusData.order_id,
+      checkoutPayload.order_id,
+      statusData.amount,
+      amount,
+      statusData.currency,
+      checkoutPayload.currency
+    );
+  });
 });

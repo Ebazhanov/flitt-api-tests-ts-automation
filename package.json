@@ -4,8 +4,11 @@
   "description": "API test learning project for Flitt",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "format": "prettier --write \"**/*.ts\"",
+    "format:check": "prettier --check \"**/*.ts\""
   },
   "repository": {
     "type": "git",
@@ -19,11 +22,15 @@
   },
   "homepage": "https://github.com/Ebazhanov/flitt-api-pure#readme",
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@types/node": "^26.1.2",
     "axios": "^1.19.0",
     "playwright": "^1.62.0",
+    "prettier": "3.9.6",
     "ts-node": "^10.9.2",
-    "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
   }
 }

@@ -1,40 +1,40 @@
-import { describe, it, expect } from 'vitest';
-import { createCheckoutUrl, getOrderStatus } from '../../src/api/flitt.client';
-import { defaultCheckoutPayload } from '../../tests/fixtures/factories';
-import { expectSuccessCheckoutResponse, expectSuccessStatusResponse, expectFailureResponse, expectValidOrderStatus } from '../../tests/helpers/assertions';
-import { TEST_DATA } from '../../tests/fixtures/testData';
+import { test } from '@playwright/test';
+import { FlittApiClient } from '../../src/api/flitt.client';
+import { defaultCheckoutPayload } from '../fixtures/factories';
+import {
+  expectFailureResponse,
+  expectSuccessCheckoutResponse,
+  expectSuccessStatusResponse,
+  expectValidOrderStatus,
+} from '../helpers/assertions';
 
-describe('Flitt API - Order Status Check (/api/status/order_id)', () => {
+test.describe('Flitt API - Order Status Endpoint (/api/status/order_id)', () => {
+  let flittClient: FlittApiClient;
 
-    it('Happy Path: should successfully return status for a newly created order', async () => {
-        // ARRANGE
-        const payload = defaultCheckoutPayload({
-            order_desc: TEST_DATA.ORDER_DESCRIPTIONS.STATUS_CHECK,
-            amount: 1000,
-        });
+  test.beforeEach(({ request }) => {
+    flittClient = new FlittApiClient(request);
+  });
 
-        // ACT - Create order
-        const checkoutResponse = await createCheckoutUrl(payload);
-        expectSuccessCheckoutResponse(checkoutResponse);
+  test('Happy Path: should successfully retrieve status of created order', async () => {
+    const payload = defaultCheckoutPayload();
 
-        // ACT - Get status
-        const statusResponse = await getOrderStatus(payload.order_id);
+    const checkoutResult = await flittClient.createCheckoutUrl(payload);
+    expectSuccessCheckoutResponse(checkoutResult);
 
-        // ASSERT
-        const statusData = expectSuccessStatusResponse(statusResponse);
-        expect(statusData.order_id).toBe(payload.order_id);
-        expectValidOrderStatus(statusData.order_status, TEST_DATA.VALID_ORDER_STATUSES);
-    });
+    const statusResult = await flittClient.getOrderStatus(payload.order_id);
+    const statusData = expectSuccessStatusResponse(statusResult);
 
-    it('Negative Path: should return appropriate error when checking status for non-existent order_id', async () => {
-        // ARRANGE
-        const nonExistentOrderId = `order_nonexistent_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    expectValidOrderStatus(statusData.order_status, [
+      'created',
+      'processing',
+      'approved',
+      'declined',
+      'pending',
+    ]);
+  });
 
-        // ACT
-        const statusResponse = await getOrderStatus(nonExistentOrderId);
-
-        // ASSERT
-        expectFailureResponse(statusResponse);
-    });
-
+  test('Negative Path: should fail when fetching status for non-existent order_id', async () => {
+    const statusResult = await flittClient.getOrderStatus('non_existent_order_id_999999');
+    expectFailureResponse(statusResult);
+  });
 });

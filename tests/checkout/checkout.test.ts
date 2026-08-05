@@ -1,31 +1,36 @@
-import { describe, it, expect } from 'vitest';
-import { createCheckoutUrl } from '../../src/api/flitt.client';
-import { defaultCheckoutPayload } from '../../tests/fixtures/factories';
-import { expectSuccessCheckoutResponse, expectFailureResponse } from '../../tests/helpers/assertions';
+import { test } from '@playwright/test';
+import { FlittApiClient } from '../../src/api/flitt.client';
+import { defaultCheckoutPayload } from '../fixtures/factories';
+import { expectSuccessCheckoutResponse, expectFailureResponse } from '../helpers/assertions';
 
-describe('Flitt API - Checkout Endpoint (/api/checkout/url)', () => {
+test.describe('Flitt API - Checkout Endpoint (/api/checkout/url)', () => {
+  let flittClient: FlittApiClient;
 
-    it('Happy Path: should successfully return checkout_url when valid payload is sent', async () => {
-        const payload = defaultCheckoutPayload({
-            order_desc: 'Demo Test Order',
-            amount: 1000,
-        });
+  test.beforeEach(({ request }) => {
+    flittClient = new FlittApiClient(request);
+  });
 
-        const response = await createCheckoutUrl(payload);
-
-        expectSuccessCheckoutResponse(response);
+  test('Happy Path: should successfully return checkout_url when valid payload is sent', async () => {
+    const payload = defaultCheckoutPayload({
+      order_desc: 'Demo Test Order',
+      amount: 1000,
     });
 
-    it('Negative Path: should return failure status when invalid signature is provided', async () => {
-        const payload = defaultCheckoutPayload({
-            order_desc: 'Demo Test Order',
-            amount: 1000,
-            signature: 'invalid_signature_hash',
-        });
+    const result = await flittClient.createCheckoutUrl(payload);
 
-        const response = await createCheckoutUrl(payload);
+    // Adjust expectation helper to accept Playwright response/body object
+    expectSuccessCheckoutResponse(result);
+  });
 
-        expectFailureResponse(response);
+  test('Negative Path: should return failure status when invalid signature is provided', async () => {
+    const payload = defaultCheckoutPayload({
+      order_desc: 'Demo Test Order',
+      amount: 1000,
+      signature: 'invalid_signature_hash',
     });
 
+    const result = await flittClient.createCheckoutUrl(payload);
+
+    expectFailureResponse(result);
+  });
 });

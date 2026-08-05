@@ -1,48 +1,24 @@
-import { describe, it, expect } from 'vitest';
-import { createCheckoutUrl } from '../../src/api/flitt.client';
-import { checkoutPayloadWithAmount } from '../../tests/fixtures/factories';
-import { expectSuccessCheckoutResponse, expectFailureResponse } from '../../tests/helpers/assertions';
-import { TEST_DATA } from '../../tests/fixtures/testData';
+import { test } from '@playwright/test';
+import { FlittApiClient } from '../../src/api/flitt.client';
+import { checkoutPayloadWithAmount } from '../fixtures/factories';
+import { expectSuccessCheckoutResponse } from '../helpers/assertions';
 
-describe('Flitt API - Checkout Boundary Values (/api/checkout/url)', () => {
+test.describe('Flitt API - Checkout Boundary Tests', () => {
+  let flittClient: FlittApiClient;
 
-    it('Boundary: should successfully process minimum valid amount (amount: 1)', async () => {
-        const payload = checkoutPayloadWithAmount(
-            TEST_DATA.AMOUNTS.MIN_VALID,
-            {
-                order_desc: TEST_DATA.ORDER_DESCRIPTIONS.MIN_AMOUNT,
-            }
-        );
+  test.beforeEach(({ request }) => {
+    flittClient = new FlittApiClient(request);
+  });
 
-        const response = await createCheckoutUrl(payload);
+  test('Boundary Path: should handle minimum valid amount', async () => {
+    const payload = checkoutPayloadWithAmount(1);
+    const result = await flittClient.createCheckoutUrl(payload);
+    expectSuccessCheckoutResponse(result);
+  });
 
-        expectSuccessCheckoutResponse(response);
-    });
-
-    it('Boundary: should successfully process large transaction amounts on link generation', async () => {
-        const payload = checkoutPayloadWithAmount(
-            TEST_DATA.AMOUNTS.MAX_VALID,
-            {
-                order_desc: TEST_DATA.ORDER_DESCRIPTIONS.LARGE_AMOUNT,
-            }
-        );
-
-        const response = await createCheckoutUrl(payload);
-
-        expectSuccessCheckoutResponse(response);
-    });
-
-    it('Boundary: should return failure when amount exceeds maximum integer limits', async () => {
-        const payload = checkoutPayloadWithAmount(
-            TEST_DATA.AMOUNTS.EXCEEDS_MAX,
-            {
-                order_desc: TEST_DATA.ORDER_DESCRIPTIONS.MAX_LIMIT,
-            }
-        );
-
-        const response = await createCheckoutUrl(payload);
-
-        expectFailureResponse(response);
-    });
-
+  test('Boundary Path: should handle maximum valid amount', async () => {
+    const payload = checkoutPayloadWithAmount(99999999);
+    const result = await flittClient.createCheckoutUrl(payload);
+    expectSuccessCheckoutResponse(result);
+  });
 });

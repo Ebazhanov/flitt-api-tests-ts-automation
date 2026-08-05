@@ -29,8 +29,7 @@ export const defaultCheckoutPayload = (
 export const checkoutPayloadWithAmount = (
   amount: number | string,
   overrides?: Partial<CreateCheckoutPayload>
-): CreateCheckoutPayload =>
-  defaultCheckoutPayload({ amount, ...overrides });
+): CreateCheckoutPayload => defaultCheckoutPayload({ amount, ...overrides });
 
 /**
  * Create checkout payload with custom currency
@@ -38,8 +37,7 @@ export const checkoutPayloadWithAmount = (
 export const checkoutPayloadWithCurrency = (
   currency: string,
   overrides?: Partial<CreateCheckoutPayload>
-): CreateCheckoutPayload =>
-  defaultCheckoutPayload({ currency, ...overrides });
+): CreateCheckoutPayload => defaultCheckoutPayload({ currency, ...overrides });
 
 /**
  * Create checkout payload with custom description
@@ -47,5 +45,4 @@ export const checkoutPayloadWithCurrency = (
 export const checkoutPayloadWithDescription = (
   orderDesc: string,
   overrides?: Partial<CreateCheckoutPayload>
-): CreateCheckoutPayload =>
-  defaultCheckoutPayload({ order_desc: orderDesc, ...overrides });
+): CreateCheckoutPayload => defaultCheckoutPayload({ order_desc: orderDesc, ...overrides });
